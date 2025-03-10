@@ -28,17 +28,19 @@ export const WeatherInfo: React.FC<WeatherInfoProps> = ({ lat, lng }) => {
     fetchWeather();
   }, [lat, lng]);
 
-  const getWindClass = (speed: number) => {
-    if (speed < 8) return "text-blue-500";
-    if (speed < 15) return "text-green-500";
-    return "text-red-500";
+  // Updated wind class function to better reflect actual wind speeds for kitesurfing
+  const getWindClass = (speed: number): string => {
+    if (speed < 8) return "text-blue-500"; // Light wind - not ideal for kitesurfing
+    if (speed < 20) return "text-green-500"; // Perfect wind - ideal for kitesurfing
+    return "text-red-500"; // Strong wind - challenging/dangerous
   };
 
-  const getWaveClass = (height: number) => {
-    if (height < 0.5) return "text-blue-400";
-    if (height < 1.5) return "text-blue-500";
-    if (height < 2.5) return "text-blue-600";
-    return "text-blue-700";
+  // Updated wave class function with more precise thresholds
+  const getWaveClass = (height: number): string => {
+    if (height < 0.5) return "text-blue-400"; // Very small waves
+    if (height < 1.5) return "text-blue-500"; // Small to medium waves
+    if (height < 2.5) return "text-blue-600"; // Medium to large waves
+    return "text-blue-700"; // Very large waves
   };
 
   if (loading) {
@@ -59,6 +61,12 @@ export const WeatherInfo: React.FC<WeatherInfoProps> = ({ lat, lng }) => {
     return <span className="text-sm text-gray-600">Weather data unavailable</span>;
   }
 
+  // Determine wind speed class - ensure this is calculated correctly
+  const windClass = getWindClass(weather.windSpeed);
+  
+  // Determine wave height class
+  const waveClass = weather.waveHeight ? getWaveClass(weather.waveHeight) : "text-blue-400";
+
   return (
     <div className="flex items-center gap-3">
       <motion.div 
@@ -67,8 +75,8 @@ export const WeatherInfo: React.FC<WeatherInfoProps> = ({ lat, lng }) => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Wind className={getWindClass(weather.windSpeed)} size={16} />
-        <span className="ml-1 font-medium">{weather.windSpeed.toFixed(1)} knots</span>
+        <Wind className={windClass} size={16} />
+        <span className={`ml-1 font-medium ${windClass}`}>{weather.windSpeed.toFixed(1)} knots</span>
       </motion.div>
       
       <motion.div 
@@ -88,8 +96,8 @@ export const WeatherInfo: React.FC<WeatherInfoProps> = ({ lat, lng }) => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <Waves className={getWaveClass(weather.waveHeight)} size={16} />
-          <span className="ml-1">{weather.waveHeight}m {weather.waveDirection}</span>
+          <Waves className={waveClass} size={16} />
+          <span className={`ml-1 ${waveClass}`}>{weather.waveHeight}m {weather.waveDirection}</span>
         </motion.div>
       )}
     </div>

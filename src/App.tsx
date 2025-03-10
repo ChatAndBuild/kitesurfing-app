@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { kitespots } from './data/spots';
 import { SpotCard } from './components/SpotCard';
 import { WorldMap } from './components/WorldMap';
-import { Wind, Map, TrendingUp, Droplet, Gem } from 'lucide-react';
-import { KiteSpot } from './types';
+import { RegionFilter } from './components/RegionFilter';
+import { Wind, Map, TrendingUp, Droplet, Gem, Filter } from 'lucide-react';
+import { KiteSpot, Region } from './types';
 import { calculateTrendingSpots } from './services/trending';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,6 +12,7 @@ const App = () => {
   const [viewMode, setViewMode] = useState<'cards' | 'map' | 'trending' | 'beginner' | 'hidden-gems'>('cards');
   const [trendingSpots, setTrendingSpots] = useState<KiteSpot[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedRegions, setSelectedRegions] = useState<Region[]>([]);
 
   useEffect(() => {
     if (viewMode === 'trending') {
@@ -35,6 +37,16 @@ const App = () => {
   );
 
   const hiddenGems = kitespots.filter(spot => spot.isHiddenGem);
+
+  // Filter spots by selected regions
+  const filterSpotsByRegion = (spots: KiteSpot[]) => {
+    if (selectedRegions.length === 0) return spots;
+    return spots.filter(spot => selectedRegions.includes(spot.region));
+  };
+
+  const filteredSpots = filterSpotsByRegion(kitespots);
+  const filteredBeginnerSpots = filterSpotsByRegion(beginnerSpots);
+  const filteredHiddenGems = filterSpotsByRegion(hiddenGems);
 
   return (
     <div className="min-h-screen bg-gray-100 font-nunito flex flex-col">
@@ -88,6 +100,25 @@ const App = () => {
           </nav>
         </div>
 
+        {/* Region Filter */}
+        {viewMode !== 'map' && viewMode !== 'trending' && (
+          <div className="flex justify-center mb-6">
+            <RegionFilter 
+              selectedRegions={selectedRegions}
+              onRegionChange={setSelectedRegions}
+            />
+          </div>
+        )}
+
+        {/* Filter Results Summary */}
+        {selectedRegions.length > 0 && viewMode !== 'map' && viewMode !== 'trending' && (
+          <div className="mb-6 text-center">
+            <p className="text-gray-600">
+              Showing spots in: <span className="font-semibold">{selectedRegions.join(', ')}</span>
+            </p>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           {viewMode === 'cards' && (
             <motion.div
@@ -96,11 +127,24 @@ const App = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
-              {kitespots.map(spot => (
-                <SpotCard key={spot.id} spot={spot} />
-              ))}
+              {filteredSpots.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredSpots.map(spot => (
+                    <SpotCard key={spot.id} spot={spot} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No spots found for the selected regions.</p>
+                  <button 
+                    onClick={() => setSelectedRegions([])}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -158,11 +202,23 @@ const App = () => {
                   These locations offer ideal conditions for beginners with shallow water, consistent winds, and smaller waves.
                 </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {beginnerSpots.map(spot => (
-                  <SpotCard key={spot.id} spot={spot} />
-                ))}
-              </div>
+              {filteredBeginnerSpots.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredBeginnerSpots.map(spot => (
+                    <SpotCard key={spot.id} spot={spot} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No beginner spots found for the selected regions.</p>
+                  <button 
+                    onClick={() => setSelectedRegions([])}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -182,11 +238,23 @@ const App = () => {
                   Discover these lesser-known kitesurfing paradises with unique features and fewer crowds.
                 </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {hiddenGems.map(spot => (
-                  <SpotCard key={spot.id} spot={spot} />
-                ))}
-              </div>
+              {filteredHiddenGems.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredHiddenGems.map(spot => (
+                    <SpotCard key={spot.id} spot={spot} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No hidden gems found for the selected regions.</p>
+                  <button 
+                    onClick={() => setSelectedRegions([])}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
 

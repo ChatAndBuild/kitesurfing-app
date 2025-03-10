@@ -75,6 +75,14 @@ export const WorldMap = () => {
     return <Wind className="text-blue-400" />;
   };
 
+  // Updated wind class function to better reflect actual wind speeds for kitesurfing
+  const getWindClass = (speed: number): string => {
+    if (speed < 8) return "rgba(59, 130, 246, 0.5)"; // Light wind - blue
+    if (speed < 20) return "rgba(16, 185, 129, 0.5)"; // Perfect wind - green
+    return "rgba(239, 68, 68, 0.5)"; // Strong wind - red
+  };
+
+  // Updated wind animation color based on wind speed
   const getWindAnimation = (windSpeed: number) => {
     // Scale animation based on wind speed
     const duration = Math.max(5 - windSpeed / 5, 1); // Faster animation for stronger winds
@@ -89,6 +97,13 @@ export const WorldMap = () => {
         ease: "easeInOut"
       }
     };
+  };
+
+  // Get marker color based on wind speed
+  const getMarkerColor = (windSpeed: number): string => {
+    if (windSpeed < 8) return "#3B82F6"; // Blue for light wind
+    if (windSpeed < 20) return "#10B981"; // Green for perfect wind
+    return "#EF4444"; // Red for strong wind
   };
 
   return (
@@ -195,36 +210,39 @@ export const WorldMap = () => {
               </Geographies>
             </motion.g>
             
-            {/* Weather background effects */}
+            {/* Weather background effects - Only render for actual kitespot locations */}
             {!isLoading && kitespots.map((spot) => {
               const windSpeed = weatherData[spot.id]?.windSpeed || 0;
               const icon = weatherData[spot.id]?.icon || '01d';
+              const windColorClass = getWindClass(windSpeed);
               
               return (
                 <motion.g key={`bg-${spot.id}`}>
-                  {/* Wind ripple effect */}
-                  <motion.circle
-                    cx={spot.coordinates.lng}
-                    cy={spot.coordinates.lat}
-                    r={windSpeed * 2}
-                    fill="rgba(135, 206, 250, 0.1)"
-                    animate={{
-                      r: [windSpeed * 2, windSpeed * 4, windSpeed * 2],
-                      opacity: [0.1, 0.2, 0.1]
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
+                  {/* Wind ripple effect - only if there's actual wind */}
+                  {windSpeed > 0 && (
+                    <motion.circle
+                      cx={spot.coordinates.lng}
+                      cy={spot.coordinates.lat}
+                      r={windSpeed * 1.5}
+                      fill={windColorClass}
+                      animate={{
+                        r: [windSpeed * 1.5, windSpeed * 3, windSpeed * 1.5],
+                        opacity: [0.1, 0.2, 0.1]
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  )}
                   
-                  {/* Weather icon background */}
+                  {/* Weather icon background - only for sunny spots */}
                   {icon.includes('01') && (
                     <motion.circle
                       cx={spot.coordinates.lng}
                       cy={spot.coordinates.lat}
-                      r={10}
+                      r={8}
                       fill="rgba(255, 215, 0, 0.1)"
                       animate={{
                         opacity: [0.1, 0.3, 0.1]
@@ -245,6 +263,7 @@ export const WorldMap = () => {
               const windSpeed = weatherData[spot.id]?.windSpeed || 0;
               const icon = weatherData[spot.id]?.icon || '01d';
               const isSelected = selectedSpot === spot.id;
+              const markerColor = isSelected ? "#3B82F6" : getMarkerColor(windSpeed);
               
               return (
                 <motion.g
@@ -263,29 +282,25 @@ export const WorldMap = () => {
                       {/* Base circle */}
                       <motion.circle
                         r={isSelected ? 8 : 6}
-                        fill={isSelected ? "#3B82F6" : "#FF6B6B"}
+                        fill={markerColor}
                         stroke="#FFFFFF"
                         strokeWidth={2}
                         animate={getWindAnimation(windSpeed)}
                       />
                       
-                      {/* Wind speed indicator */}
+                      {/* Wind speed indicator - only if there's actual wind */}
                       {windSpeed > 0 && (
                         <motion.circle
                           r={windSpeed / 2 + 6}
                           fill="transparent"
-                          stroke={
-                            windSpeed < 8 ? "rgba(59, 130, 246, 0.5)" :
-                            windSpeed < 15 ? "rgba(16, 185, 129, 0.5)" :
-                            "rgba(239, 68, 68, 0.5)"
-                          }
+                          stroke={getWindClass(windSpeed)}
                           strokeWidth={1.5}
                           strokeDasharray="3,2"
                           animate={{
                             rotate: [0, 360],
                           }}
                           transition={{
-                            duration: 20 / windSpeed, // Faster rotation for stronger winds
+                            duration: 20 / Math.max(windSpeed, 1), // Prevent division by zero
                             repeat: Infinity,
                             ease: "linear"
                           }}
@@ -345,11 +360,11 @@ export const WorldMap = () => {
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-green-500 mr-1"></div>
-            <span>Medium (8-15 knots)</span>
+            <span>Medium (8-20 knots)</span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-red-500 mr-1"></div>
-            <span>Strong ({">"}15 knots)</span>
+            <span>Strong ({">"}20 knots)</span>
           </div>
         </div>
       </motion.div>
@@ -401,7 +416,7 @@ const SpotTooltip = ({
 }) => {
   const getWindClass = (speed: number) => {
     if (speed < 8) return "text-blue-500";
-    if (speed < 15) return "text-green-500";
+    if (speed < 20) return "text-green-500";
     return "text-red-500";
   };
   

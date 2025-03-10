@@ -25,7 +25,17 @@ export interface KiteSpot {
   isBeginnerFriendly?: boolean;
   isHiddenGem?: boolean;
   specialFeature?: string;
+  region: Region;
 }
+
+export type Region = 
+  | 'Europe' 
+  | 'North America' 
+  | 'South America' 
+  | 'Africa' 
+  | 'Asia' 
+  | 'Oceania' 
+  | 'Middle East';
 
 export interface WeatherCondition {
   temperature: number;

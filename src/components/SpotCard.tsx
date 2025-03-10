@@ -16,6 +16,7 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
   const [imageLoading, setImageLoading] = useState(false);
   const [showForecast, setShowForecast] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const loadDynamicImage = async () => {
@@ -42,6 +43,7 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
         }
       } catch (error) {
         console.error('Failed to load dynamic image:', error);
+        setImageError(true);
       } finally {
         setImageLoading(false);
       }
@@ -49,6 +51,21 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
 
     loadDynamicImage();
   }, [spot]);
+
+  const handleImageError = () => {
+    console.log(`Image failed to load for ${spot.name}`);
+    setImageError(true);
+    // Use fallback image from our images service
+    getLocationImages(`kitesurfing ${spot.location}`, 1).then(images => {
+      if (images.length > 0) {
+        setDynamicImage(images[0].url);
+        setPhotographer({
+          name: images[0].photographer,
+          url: images[0].photographerUrl
+        });
+      }
+    });
+  };
 
   const difficultyColor = {
     beginner: 'bg-green-100 text-green-800',
@@ -111,6 +128,8 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
           src={dynamicImage || spot.imageUrl} 
           alt={spot.name} 
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          onError={handleImageError}
+          loading="lazy"
         />
         
         {imageLoading && (
