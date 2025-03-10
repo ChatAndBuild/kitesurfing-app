@@ -50,14 +50,101 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 font-nunito flex flex-col">
-      <header className="bg-gradient-to-r from-blue-500 to-teal-400 text-white py-8 px-4">
-        <div className="container mx-auto">
-          <h1 className="text-4xl font-bold text-center">
-            Elite Kitesurf Spots
-          </h1>
-          <p className="text-center mt-2 max-w-2xl mx-auto">
-            Discover the world's most exclusive kitesurfing destinations with real-time wind and wave conditions
-          </p>
+      <header className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-teal-400 text-white py-12 px-4">
+        {/* Animated wave background */}
+        <div className="absolute inset-0 z-0 opacity-20">
+          <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+            <motion.path 
+              initial={{ d: "M0,160L48,144C96,128,192,96,288,106.7C384,117,480,171,576,186.7C672,203,768,181,864,154.7C960,128,1056,96,1152,96C1248,96,1344,128,1392,144L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" }}
+              animate={{ 
+                d: [
+                  "M0,160L48,144C96,128,192,96,288,106.7C384,117,480,171,576,186.7C672,203,768,181,864,154.7C960,128,1056,96,1152,96C1248,96,1344,128,1392,144L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z",
+                  "M0,192L48,197.3C96,203,192,213,288,192C384,171,480,117,576,112C672,107,768,149,864,165.3C960,181,1056,171,1152,149.3C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+                ] 
+              }}
+              transition={{ 
+                repeat: Infinity,
+                repeatType: "reverse",
+                duration: 10,
+                ease: "easeInOut"
+              }}
+              fill="#fff"
+            />
+          </svg>
+          <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+            <motion.path 
+              initial={{ d: "M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,90.7C672,85,768,107,864,133.3C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" }}
+              animate={{ 
+                d: [
+                  "M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,90.7C672,85,768,107,864,133.3C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z",
+                  "M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,165.3C960,192,1056,224,1152,229.3C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+                ] 
+              }}
+              transition={{ 
+                repeat: Infinity,
+                repeatType: "reverse",
+                duration: 8,
+                ease: "easeInOut",
+                delay: 0.5
+              }}
+              fill="#fff"
+            />
+          </svg>
+        </div>
+
+        {/* Decorative elements */}
+        <motion.div 
+          className="absolute top-4 right-4 text-white opacity-20"
+          animate={{ 
+            rotate: [0, 10, 0, -10, 0],
+            scale: [1, 1.1, 1, 0.9, 1]
+          }}
+          transition={{ 
+            repeat: Infinity,
+            duration: 15,
+            ease: "easeInOut"
+          }}
+        >
+          <Wind size={80} />
+        </motion.div>
+
+        <div className="container mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-center"
+          >
+            <div className="flex items-center mb-2">
+              <Wind className="mr-3" size={32} strokeWidth={2.5} />
+              <h1 className="text-5xl font-extrabold tracking-tight">
+                Elite Kitesurf Spots
+              </h1>
+            </div>
+            
+            <div className="h-1 w-24 bg-white opacity-70 rounded-full my-4"></div>
+            
+            <p className="text-center mt-2 max-w-2xl mx-auto text-lg font-light">
+              Discover the world's most exclusive kitesurfing destinations with real-time wind and wave conditions
+            </p>
+            
+            <motion.div 
+              className="mt-6 flex space-x-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+            >
+              <span className="px-3 py-1 bg-white bg-opacity-20 rounded-full text-sm backdrop-blur-sm">
+                Real-time conditions
+              </span>
+              <span className="px-3 py-1 bg-white bg-opacity-20 rounded-full text-sm backdrop-blur-sm">
+                Global destinations
+              </span>
+              <span className="px-3 py-1 bg-white bg-opacity-20 rounded-full text-sm backdrop-blur-sm">
+                Expert insights
+              </span>
+            </motion.div>
+          </motion.div>
         </div>
       </header>
 
