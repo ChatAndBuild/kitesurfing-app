@@ -116,7 +116,8 @@ export const kitespots: KiteSpot[] = [
       lat: 37.8833,
       lng: 12.4333
     },
-    imageUrl: 'https://images.pexels.com/photos/1430672/pexels-photo-1430672.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    // Changed to a unique image for Lo Stagnone
+    imageUrl: 'https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     isBeginnerFriendly: true,
     waveInfo: {
       averageHeight: 0.2,
@@ -396,7 +397,7 @@ export const kitespots: KiteSpot[] = [
       lat: -33.9917,
       lng: 151.1411
     },
-    imageUrl: 'https://images.pexels.com/photos/1430672/pexels-photo-1430672.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    imageUrl: 'https://images.pexels.com/photos/635359/pexels-photo-635359.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     isBeginnerFriendly: true,
     waveInfo: {
       averageHeight: 0.4,
