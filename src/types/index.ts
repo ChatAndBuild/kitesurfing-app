@@ -26,6 +26,17 @@ export interface KiteSpot {
   isHiddenGem?: boolean;
   specialFeature?: string;
   region: Region;
+  // New fields for expanded card information
+  localInfo?: {
+    languages?: string[];
+    currency?: string;
+    timeZone?: string;
+    funFact?: string;
+    localTips?: string;
+    bestTimeToVisit?: string;
+    localFood?: string;
+    visaRequirements?: string;
+  };
 }
 
 export type Region = 

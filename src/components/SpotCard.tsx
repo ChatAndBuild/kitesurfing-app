@@ -1,5 +1,5 @@
-import { Wind, Waves, Calendar, Droplet, Clock } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Wind, Waves, Calendar, Droplet, Clock, Globe, DollarSign, Languages, MapPin, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { KiteSpot } from '../types';
 import { WeatherInfo } from './WeatherInfo';
@@ -17,6 +17,7 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
   const [showForecast, setShowForecast] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [showExpandedInfo, setShowExpandedInfo] = useState(false);
 
   useEffect(() => {
     const loadDynamicImage = async () => {
@@ -91,6 +92,10 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
     }
   };
 
+  const toggleExpandedInfo = () => {
+    setShowExpandedInfo(!showExpandedInfo);
+  };
+
   return (
     <motion.div 
       className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
@@ -98,8 +103,12 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       whileHover={{ y: -5 }}
+      layout
     >
-      <div className="relative h-48 overflow-hidden">
+      <div 
+        className="relative h-48 overflow-hidden cursor-pointer"
+        onClick={toggleExpandedInfo}
+      >
         {spot.trending && (
           <div className="absolute top-2 left-2 z-10">
             <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -124,10 +133,11 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
           </div>
         )}
         
-        <img 
+        <motion.img 
           src={dynamicImage || spot.imageUrl} 
           alt={spot.name} 
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-500"
+          whileHover={{ scale: 1.05 }}
           onError={handleImageError}
           loading="lazy"
         />
@@ -144,10 +154,21 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
             target="_blank" 
             rel="noopener noreferrer"
             className="absolute bottom-1 right-1 text-xs text-white bg-black bg-opacity-50 px-2 py-1 rounded"
+            onClick={(e) => e.stopPropagation()}
           >
             Photo: {photographer.name}
           </a>
         )}
+
+        {/* Expand indicator */}
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-80 rounded-full p-1">
+          <motion.div
+            animate={{ y: [0, 3, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+          >
+            {showExpandedInfo ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </motion.div>
+        </div>
       </div>
       
       <div className="p-5">
@@ -218,6 +239,113 @@ export const SpotCard: React.FC<SpotCardProps> = ({ spot }) => {
           <Calendar size={16} />
           <span>Best time: {spot.bestMonths.slice(0, 3).join(', ')}...</span>
         </div>
+        
+        {/* Expanded Information Section */}
+        <AnimatePresence>
+          {showExpandedInfo && spot.localInfo && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-4 pt-4 border-t border-gray-200"
+            >
+              <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                <Globe size={16} className="mr-2" />
+                Local Information
+              </h4>
+              
+              <div className="space-y-3">
+                {spot.localInfo.languages && (
+                  <div className="flex items-start">
+                    <Languages size={16} className="text-blue-500 mt-1 mr-2 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Languages</p>
+                      <p className="text-sm">{spot.localInfo.languages.join(', ')}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {spot.localInfo.currency && (
+                  <div className="flex items-start">
+                    <DollarSign size={16} className="text-green-500 mt-1 mr-2 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Currency</p>
+                      <p className="text-sm">{spot.localInfo.currency}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {spot.localInfo.timeZone && (
+                  <div className="flex items-start">
+                    <Clock size={16} className="text-purple-500 mt-1 mr-2 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Time Zone</p>
+                      <p className="text-sm">{spot.localInfo.timeZone}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {spot.localInfo.funFact && (
+                  <div className="flex items-start">
+                    <Info size={16} className="text-amber-500 mt-1 mr-2 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Fun Fact</p>
+                      <p className="text-sm">{spot.localInfo.funFact}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {spot.localInfo.localTips && (
+                  <div className="flex items-start">
+                    <MapPin size={16} className="text-red-500 mt-1 mr-2 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Local Tips</p>
+                      <p className="text-sm">{spot.localInfo.localTips}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {spot.localInfo.localFood && (
+                  <div className="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500 mt-1 mr-2 flex-shrink-0">
+                      <path d="M15 11h.01"></path>
+                      <path d="M11 15h.01"></path>
+                      <path d="M16 16h.01"></path>
+                      <path d="m2 16 20 6-6-20A20 20 0 0 0 2 16"></path>
+                      <path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"></path>
+                    </svg>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Local Food</p>
+                      <p className="text-sm">{spot.localInfo.localFood}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {spot.localInfo.visaRequirements && (
+                  <div className="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500 mt-1 mr-2 flex-shrink-0">
+                      <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                      <line x1="2" x2="22" y1="10" y2="10"></line>
+                    </svg>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Visa Requirements</p>
+                      <p className="text-sm">{spot.localInfo.visaRequirements}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <button 
+                onClick={toggleExpandedInfo}
+                className="w-full mt-4 text-sm text-blue-500 hover:text-blue-700 transition-colors flex items-center justify-center gap-1"
+              >
+                Show less
+                <ChevronUp size={16} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
         
         {/* Forecast Toggle Button */}
         <button 
