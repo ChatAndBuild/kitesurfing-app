@@ -64,9 +64,9 @@ export const calculateTrendingSpots = async (count: number = 3): Promise<KiteSpo
       topSpots.map(async (trendingSpot) => {
         const spot = kitespots.find(s => s.id === trendingSpot.spotId)!;
         
-        // Get dynamic images based on weather condition
+        // Get dynamic images based on weather condition and spot ID to ensure uniqueness
         try {
-          const images = await getTrendingSpotImages(trendingSpot.weatherCondition);
+          const images = await getTrendingSpotImages(trendingSpot.weatherCondition, spot.id);
           
           return {
             ...spot,
